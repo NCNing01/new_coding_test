@@ -95,6 +95,10 @@ class Game
         # If the property is unowned, the player must buy it.
         buy_property(player, space)
 
+      elsif space["owner"] != player.name
+        # If the property is owned by another player, the current player must pay rent.
+        pay_property(player, space)
+
       end
     else
       return
@@ -106,10 +110,25 @@ class Game
     price = space["price"]
 
     if player.money >= price
-      player.money -= price # Deduct the price from the player's money
-      space["owner"] = player.name # Set the owner of the property to the player's name
+      player.money -= price
+      space["owner"] = player.name 
     else
       player.bankrupt = true # If the player cannot afford the property, they go bankrupt
+    end
+  end
+
+  def pay_property(player, space)
+    # Handle the logic for paying rent on a property. 
+    owner_name = space["owner"]
+    color = space["color"]
+    rent = space["rent"]
+    owner = @players.find { |p| p.name == owner_name } 
+
+    if player.money >= rent
+      player.money -= rent
+      owner.money += rent 
+    else
+      player.bankrupt = true # If the player cannot afford to pay rent, they go bankrupt
     end
   end
 
