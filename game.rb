@@ -56,6 +56,32 @@ class Game
         @color_groups[color] << space
       end
     end
+  end
+
+  def play
+    # Main game loop that iterates through the rolls and processes each player's turn until all rolls are exhausted or a player goes bankrupt.
+    turn = 0
+
+    @rolls.each do |roll|
+      player = @players[turn % @players.length] # Determine the current player based on the turn number and total players
+
+      move_player(player, roll)
+
+      turn += 1
+    end
+    
+  end
+
+  def move_player(player, roll)
+    old_position = player.position
+    new_position = (old_position + roll) % @board_size # Calculate new position with wrap-around using modulo operator
+
+    if new_position < old_position
+      player.money += 1 # Collect $1 for passing the start position
+    end
+
+    player.position = new_position
+  end
 
 end
 
