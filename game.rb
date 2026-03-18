@@ -51,7 +51,7 @@ class Game
     # This will help in calculating rent based on the number of properties owned in the same color group.
     @board.each do |space|
       if space["type"] == "property"
-        color = space["color"]
+        color = space["colour"]
         @color_groups[color] ||= [] # Check if the color group already exists, if not initialize it as an empty array
         @color_groups[color] << space
       end
@@ -97,18 +97,16 @@ class Game
 
   def handle_space(player, space)
     # Handle the logic for when a player lands on a space. 
-    if space["type"] == "property"
-      if space["owner"].nil?
-        # If the property is unowned, the player must buy it.
-        buy_property(player, space)
+    return unless space["type"] == "property"
+    
+    if space["owner"].nil?
+      # If the property is unowned, the player must buy it.
+      buy_property(player, space)
 
-      elsif space["owner"] != player.name
-        # If the property is owned by another player, the current player must pay rent.
-        pay_property(player, space)
-
-      end
-    else
-      return
+    elsif space["owner"] != player
+      # If the property is owned by another player, the current player must pay rent.
+      pay_property(player, space)
+    
     end
   end
 
@@ -118,14 +116,14 @@ class Game
 
     player.money -= price
     space["owner"] = player.name 
-    
+
   end
 
   def pay_property(player, space)
     # Handle the logic for paying rent on a property. 
     owner_name = space["owner"]
-    color = space["color"]
-    rent = space["rent"]
+    color = space["colour"]
+    rent = space["price"]
     owner = @players.find { |p| p.name == owner_name } 
 
     if owns_same_color_group?(owner, color)
@@ -155,7 +153,7 @@ class Game
       puts "#{player.name}:"
       puts "  Money: $#{player.money}"
       puts "  Position: #{space_name}"
-      puts "  Bankrupt: #{player.bankrupt ? 'Yes' : 'No'}
+      puts "  Bankrupt: #{player.bankrupt ? 'Yes' : 'No'}"
     end
   end
 
