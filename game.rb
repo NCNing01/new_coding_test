@@ -67,12 +67,17 @@ class Game
 
       move_player(player, roll)
 
+      space = @board[player.position]
+
+      handle_space(player, space)
+
       turn += 1
     end
     
   end
 
   def move_player(player, roll)
+    # Move the player based on the roll and handle wrap-around using modulo operator. 
     old_position = player.position
     new_position = (old_position + roll) % @board_size # Calculate new position with wrap-around using modulo operator
 
@@ -81,6 +86,31 @@ class Game
     end
 
     player.position = new_position
+  end
+
+  def handle_space(player, space)
+    # Handle the logic for when a player lands on a space. 
+    if space["type"] == "property"
+      if space["owner"].nil?
+        # If the property is unowned, the player must buy it.
+        buy_property(player, space)
+
+      end
+    else
+      return
+    end
+  end
+
+  def buy_property(player, space)
+    # Handle the logic for buying a property. 
+    price = space["price"]
+
+    if player.money >= price
+      player.money -= price # Deduct the price from the player's money
+      space["owner"] = player.name # Set the owner of the property to the player's name
+    else
+      player.bankrupt = true # If the player cannot afford the property, they go bankrupt
+    end
   end
 
 end
