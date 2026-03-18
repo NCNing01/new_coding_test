@@ -71,9 +71,16 @@ class Game
 
       handle_space(player, space)
 
+      if player.money < 0
+        player.bankrupt = true
+        puts "#{player.name} has gone bankrupt!"
+        break # End the game if a player goes bankrupt
+      end
+
       turn += 1
     end
     
+    print_results
   end
 
   def move_player(player, roll)
@@ -109,12 +116,9 @@ class Game
     # Handle the logic for buying a property. 
     price = space["price"]
 
-    if player.money >= price
-      player.money -= price
-      space["owner"] = player.name 
-    else
-      player.bankrupt = true # If the player cannot afford the property, they go bankrupt
-    end
+    player.money -= price
+    space["owner"] = player.name 
+    
   end
 
   def pay_property(player, space)
@@ -128,17 +132,31 @@ class Game
       rent *= 2 # If the owner owns all properties of the same color, rent is doubled
     end
 
-    if player.money >= rent
-      player.money -= rent
-      owner.money += rent 
-    else
-      player.bankrupt = true # If the player cannot afford to pay rent, they go bankrupt
-    end
+    player.money -= rent
+    owner.money += rent 
+    
   end
 
   def owns_same_color_group?(owner, color)
     # Check if the owner owns all properties of the same color group. 
     @color_groups[color].all? { |property| property["owner"] == owner.name }
+  end
+
+  def print_results
+    # Print the final results of the game, showing each player's name, money, and bankruptcy status.
+    winner = @players.max_by { |player| player.money }
+    
+    puts "Final Results:"
+    puts "Winner: #{winner.name} with $#{winner.money}"
+    
+    @players.each do |player|
+      space_name = @board[player.position]["name"]
+
+      puts "#{player.name}:"
+      puts "  Money: $#{player.money}"
+      puts "  Position: #{space_name}"
+      puts "  Bankrupt: #{player.bankrupt ? 'Yes' : 'No'}
+    end
   end
 
 end
