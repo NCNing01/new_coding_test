@@ -124,12 +124,21 @@ class Game
     rent = space["rent"]
     owner = @players.find { |p| p.name == owner_name } 
 
+    if owns_same_color_group?(owner, color)
+      rent *= 2 # If the owner owns all properties of the same color, rent is doubled
+    end
+
     if player.money >= rent
       player.money -= rent
       owner.money += rent 
     else
       player.bankrupt = true # If the player cannot afford to pay rent, they go bankrupt
     end
+  end
+
+  def owns_same_color_group?(owner, color)
+    # Check if the owner owns all properties of the same color group. 
+    @color_groups[color].all? { |property| property["owner"] == owner.name }
   end
 
 end
